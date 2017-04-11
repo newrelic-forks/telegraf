@@ -1,6 +1,5 @@
 github.com/Shopify/sarama 574d3147eee384229bf96a5d12c207fe7b5234f3
 github.com/Sirupsen/logrus 61e43dc76f7ee59a82bdf3d71033dc12bea4c77d
-github.com/fsouza/go-dockerclient e24e809e9db395f1e3c85af1b88f2002023610f5
 github.com/aerospike/aerospike-client-go 95e1ad7791bdbca44707fedbb29be42024900d9c
 github.com/amir/raidman c74861fe6a7bb8ede0a010ce4485bdbb4fc4c985
 github.com/aws/aws-sdk-go 7524cb911daddd6e5c9195def8e59ae892bef8d9
@@ -11,6 +10,7 @@ github.com/couchbase/gomemcached 4a25d2f4e1dea9ea7dd76dfd943407abf9b07d29
 github.com/couchbase/goutils 5823a0cbaaa9008406021dc5daf80125ea30bba6
 github.com/davecgh/go-spew 346938d642f2ec3594ed81d874461961cd0faa76
 github.com/docker/distribution fb0bebc4b64e3881cc52a2478d749845ed76d2a8
+github.com/docker/docker fd5f9d7941287cbbaeecfd16e0159508b3f6af63
 github.com/docker/engine-api 4290f40c056686fcaa5c9caf02eac1dde9315adf
 github.com/docker/go-connections 9670439d95da2651d9dfc7acc5d2ed92d3f25ee6
 github.com/docker/go-units 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
@@ -18,6 +18,7 @@ github.com/eapache/go-resiliency b86b1ec0dd4209a588dc1285cdd471e73525c0b3
 github.com/eapache/go-xerial-snappy bb955e01b9346ac19dc29eb16586c90ded99a98c
 github.com/eapache/queue 44cc805cf13205b55f69e14bcb69867d1ae92f98
 github.com/eclipse/paho.mqtt.golang d4f545eb108a2d19f9b1a735689dbfb719bc21fb
+github.com/fsouza/go-dockerclient e24e809e9db395f1e3c85af1b88f2002023610f5
 github.com/go-sql-driver/mysql 2e00b5cd70399450106cec6431c2e2ce3cae5034
 github.com/gobwas/glob bea32b9cd2d6f55753d94a28e959b13f0244797a
 github.com/golang/protobuf 8ee79997227bf9b34611aee7946ae64735e6fd93
@@ -25,6 +26,7 @@ github.com/golang/snappy 7db9049039a047d955fe8c19b83c8ff5abd765c7
 github.com/gorilla/mux 392c28fe23e1c45ddba891b0320b3b5df220beea
 github.com/hailocab/go-hostpool e80d13ce29ede4452c43dea11e79b9bc8a15b478
 github.com/hashicorp/consul 63d2fc68239b996096a1c55a0d4b400ea4c2583f
+github.com/hashicorp/go-cleanhttp ad28ea4487f05916463e2423a55166280e8254b5
 github.com/hpcloud/tail 915e5feba042395f5fda4dbe9c0e99aeab3088b3
 github.com/influxdata/toml 5d1d907f22ead1cd47adde17ceec5bda9cacaf8f
 github.com/influxdata/wlog 7c63b0a71ef8300adc255344d275e10e5c3a71ec
