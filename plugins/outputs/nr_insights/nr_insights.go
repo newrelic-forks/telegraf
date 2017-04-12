@@ -53,8 +53,7 @@ func (n *Insights) Write(metrics []telegraf.Metric) error {
 		for name, value := range metric.Tags() {
 			nrMetric[name] = value
 		}
-		nrMetric["SubType"] = metric.Name()
-		nrMetric["eventType"] = "bgreen_test"
+		nrMetric["eventType"] = metric.Name()
 		nrMetric["timestamp"] = metric.Time().Unix()
 		if err := n.client.EnqueueEvent(nrMetric); err != nil {
 			return fmt.Errorf("Error enqueuing insights metric: %s", err.Error())

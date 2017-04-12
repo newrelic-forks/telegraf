@@ -195,7 +195,7 @@ func (d *Docker) gatherInfo(acc telegraf.Accumulator) error {
 		name := strings.ToLower(strings.Replace(rawData[0], " ", "_", -1))
 		if name == "pool_blocksize" {
 			// pool blocksize
-			acc.AddFields("docker",
+			acc.AddFields("docker_daemon_pool_blocksize",
 				map[string]interface{}{"pool_blocksize": value},
 				map[string]string{"unit": "bytes", "engine_host": d.engine_host},
 				now)
@@ -210,13 +210,13 @@ func (d *Docker) gatherInfo(acc telegraf.Accumulator) error {
 		}
 	}
 	if len(dataFields) > 0 {
-		acc.AddFields("docker_data",
+		acc.AddFields("docker_daemon_data",
 			dataFields,
 			map[string]string{"unit": "bytes", "engine_host": d.engine_host},
 			now)
 	}
 	if len(metadataFields) > 0 {
-		acc.AddFields("docker_metadata",
+		acc.AddFields("docker_daemon_metadata",
 			metadataFields,
 			map[string]string{"unit": "bytes", "engine_host": d.engine_host},
 			now)
@@ -334,7 +334,7 @@ func gatherContainerStats(
 
 	memtags := copyTags(tags)
 	memtags["container_id"] = id
-	acc.AddFields("docker_container_mem", memfields, tags, now)
+	acc.AddFields("docker_container_memory", memfields, tags, now)
 
 	cpufields := map[string]interface{}{
 		"cpu_usage_total":                  stat.CPUStats.CPUUsage.TotalUsage,
