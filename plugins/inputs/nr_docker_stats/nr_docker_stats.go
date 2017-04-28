@@ -36,6 +36,7 @@ type DockerClient interface {
 	Info(ctx context.Context) (types.Info, error)
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
 	ContainerStats(ctx context.Context, containerID string, stream bool) (io.ReadCloser, error)
+	ContainerInspect(ctx context.Context, containerID string) (types.ContainerJSON, error)
 }
 
 // KB, MB, GB, TB, PB...human friendly
@@ -129,7 +130,12 @@ func (d *Docker) Gather(acc telegraf.Accumulator) error {
 	for _, container := range containers {
 		go func(c types.Container) {
 			defer wg.Done()
-			err := d.gatherContainer(c, acc)
+			containerInfo, err := d.getContainerState(c.ID)
+			if err != nil {
+				log.Printf("E! Error gathering container %s info: %s\n", c.ID, err.Error())
+				return
+			}
+			err = d.gatherContainer(c, acc, &containerInfo)
 			if err != nil {
 				log.Printf("E! Error gathering container %s stats: %s\n",
 					c.Names, err.Error())
@@ -139,6 +145,12 @@ func (d *Docker) Gather(acc telegraf.Accumulator) error {
 	wg.Wait()
 
 	return nil
+}
+
+func (d *Docker) getContainerState(cid string) (types.ContainerJSON, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout.Duration)
+	defer cancel()
+	return d.client.ContainerInspect(ctx, cid)
 }
 
 func (d *Docker) getCPUCount() (int, error) {
@@ -227,6 +239,7 @@ func (d *Docker) gatherInfo(acc telegraf.Accumulator) error {
 func (d *Docker) gatherContainer(
 	container types.Container,
 	acc telegraf.Accumulator,
+	containerInfo *types.ContainerJSON,
 ) error {
 	var v *types.StatsJSON
 	// Parse container name
@@ -280,18 +293,18 @@ func (d *Docker) gatherContainer(
 		tags[k] = label
 	}
 
-	gatherContainerStats(v, acc, tags, container.ID, d.Total, d.cpuCount)
+	d.gatherContainerStats(v, acc, tags, container.ID, d.Total, containerInfo)
 
 	return nil
 }
 
-func gatherContainerStats(
+func (d *Docker) gatherContainerStats(
 	stat *types.StatsJSON,
 	acc telegraf.Accumulator,
 	tags map[string]string,
 	id string,
 	total bool,
-	cpuCount int,
+	containerInfo *types.ContainerJSON,
 ) {
 	now := stat.Read
 
@@ -336,6 +349,16 @@ func gatherContainerStats(
 	memtags["container_id"] = id
 	acc.AddFields("docker_container_memory", memfields, tags, now)
 
+	period := containerInfo.ContainerJSONBase.HostConfig.CPUPeriod
+	quota := containerInfo.ContainerJSONBase.HostConfig.CPUQuota
+
+	var quotaPercent float64
+	if period != 0 {
+		quotaPercent = float64(quota) / float64(period)
+	}
+
+	sharesPercent := float64(containerInfo.ContainerJSONBase.HostConfig.CPUShares) / float64(1024)
+
 	cpufields := map[string]interface{}{
 		"cpu_usage_total":                  stat.CPUStats.CPUUsage.TotalUsage,
 		"cpu_usage_in_usermode":            stat.CPUStats.CPUUsage.UsageInUsermode,
@@ -344,7 +367,9 @@ func gatherContainerStats(
 		"cpu_throttling_periods":           stat.CPUStats.ThrottlingData.Periods,
 		"cpu_throttling_throttled_periods": stat.CPUStats.ThrottlingData.ThrottledPeriods,
 		"cpu_throttling_throttled_time":    stat.CPUStats.ThrottlingData.ThrottledTime,
-		"cpu_usage_core_count":             calculateCoreCount(stat, cpuCount),
+		"cpu_usage_core_count":             calculateCoreCount(stat, d.cpuCount),
+		"cpu_quota":                        quotaPercent,
+		"cpu_shares":                       sharesPercent,
 	}
 	cputags := copyTags(tags)
 	cputags["container_id"] = id
